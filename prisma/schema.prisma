@@ -26,6 +26,7 @@ enum Role {
 enum ActivityType {
   MEAL
   WALK
+  WATER
   MEDICATION
 }
 
@@ -50,7 +51,7 @@ model Profile {
   updatedAt DateTime    @updatedAt
 
   userId String
-  user   user   @relation(field: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
 
   householdId String?
   household   Household? @relation(fields: [householdId], references: [id])
@@ -87,4 +88,20 @@ model Dog {
   household   Household @relation(fields: [householdId], references: [id])
 
   activities Activity[]
+}
+
+model Activity {
+  id        String       @id @default(uuid())
+  type      ActivityType
+  notes     String?
+  photo     String?
+  timestamp DateTime     @default(now())
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  dogId String
+  dog   Dog    @relation(fields: [dogId], references: [id])
+
+  loggedById String
+  loggedBy   Profile @relation(fields: [loggedById], references: [id])
 }
