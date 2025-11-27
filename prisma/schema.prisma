@@ -68,3 +68,23 @@ model Household {
   members Profile[]
   dogs    Dog[]
 }
+
+model Dog {
+  id                  String   @id @default(uuid())
+  name                String
+  breed               String?
+  age                 Int?
+  weight              Float?
+  photo               String?
+  allergies           String?
+  dietaryRestrictions String?
+  medication          String?
+  vetContact          String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id])
+
+  activities Activity[]
+}
