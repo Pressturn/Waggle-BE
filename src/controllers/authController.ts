@@ -9,26 +9,45 @@ const signUp = async (req: Request, res: Response) => {
     try {
         const { name, email, password } = req.body
 
-        const existingUser = await prisma.user.findUnique({
+        const existingAccount = await prisma.account.findUnique({
             where: { email }
         })
 
-        if (existingUser) {
+        if (existingAccount) {
             return res.status(400).json({ message: 'User already exists' })
         }
 
         const hashedPassword = await bcrypt.hash(password, saltRounds)
 
-        const user = await prisma.user.create({
+        const account = await prisma.account.create({
             data: {
                 name,
                 email,
-                password: hashedPassword
+                password: hashedPassword,
+                Profile: {
+                    create: {
+                        type: 'FAMILY',
+                        name: name,
+                        role: 'OWNER',
+                        household: {
+                            create: {
+                                name: `${name}'s Family`
+                            }
+                        }
+                    }
+                }
+            },
+            include: {
+                Profile: {
+                    include: {
+                        household: true
+                    }
+                }
             }
         })
 
         const token = jwt.sign(
-            { userId: user.id },
+            { accountId: account.id },
             process.env.JWT_SECRET as string,
             { expiresIn: '1d' }
         )
@@ -36,10 +55,11 @@ const signUp = async (req: Request, res: Response) => {
         res.status(201).json({
             message: 'User created successfully',
             token,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email
+            account: {
+                id: account.id,
+                name: account.name,
+                email: account.email,
+                profile: account.Profile[0]
             }
         })
     } catch (error) {
@@ -53,7 +73,7 @@ const signIn = async (req: Request, res: Response) => {
 
         const { email, password } = req.body
 
-        const user = await prisma.user.findUnique({
+        const user = await prisma.account.findUnique({
             where: { email }
         })
 
@@ -74,7 +94,7 @@ const signIn = async (req: Request, res: Response) => {
         )
 
         res.json({
-            messsage: 'Login successful',
+            message: 'Login successful',
             token,
             user: {
                 id: user.id,
@@ -85,8 +105,12 @@ const signIn = async (req: Request, res: Response) => {
 
     } catch (error) {
         console.error('Signin error:', error)
-        res.status(500).json({ message: 'Serevr Error' })
+        res.status(500).json({ message: 'Server Error' })
     }
 }
 
-export { signUp, signIn }
+const signOut = async (req: Request, res: Response) => {
+    res.json({ message: 'Signed out' })
+}
+
+export { signUp, signIn, signOut }

@@ -1,19 +1,15 @@
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-// This is your Prisma schema file,
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-// ENUM 
+//enum 
+
 enum ProfileType {
   FAMILY
 }
@@ -31,16 +27,16 @@ enum ActivityType {
   MEDICATION
 }
 
-// MODELS
+//models
 
-model User {
+model Account {
   id        String    @id @default(uuid())
   name      String
   email     String    @unique
   password  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  profiles  Profile[]
+  Profile   Profile[]
 }
 
 model Profile {
@@ -51,28 +47,25 @@ model Profile {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id])
 
   householdId String?
+  activities  Activity[]
   household   Household? @relation(fields: [householdId], references: [id])
-
-  activities Activity[]
 }
 
-// simple model to build post mvp
 model Household {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  members Profile[]
-  dogs    Dog[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  dogs      Dog[]
+  profile   Profile[]
 }
 
 model Dog {
-  id                  String   @id @default(uuid())
+  id                  String     @id @default(uuid())
   name                String
   breed               String?
   age                 Int?
@@ -82,27 +75,23 @@ model Dog {
   dietaryRestrictions String?
   medication          String?
   vetContact          String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  householdId String
-  household   Household @relation(fields: [householdId], references: [id])
-
-  activities Activity[]
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  householdId         String
+  activities          Activity[]
+  household           Household  @relation(fields: [householdId], references: [id])
 }
 
 model Activity {
-  id        String       @id @default(uuid())
-  type      ActivityType
-  notes     String?
-  photo     String?
-  timestamp DateTime     @default(now())
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  dogId String
-  dog   Dog    @relation(fields: [dogId], references: [id])
-
+  id         String       @id @default(uuid())
+  type       ActivityType
+  notes      String?
+  photo      String?
+  timestamp  DateTime     @default(now())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  dogId      String
   loggedById String
-  loggedBy   Profile @relation(fields: [loggedById], references: [id])
+  dog        Dog          @relation(fields: [dogId], references: [id])
+  loggedBy   Profile      @relation(fields: [loggedById], references: [id])
 }
