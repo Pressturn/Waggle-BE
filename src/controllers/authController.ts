@@ -73,22 +73,22 @@ const signIn = async (req: Request, res: Response) => {
 
         const { email, password } = req.body
 
-        const user = await prisma.account.findUnique({
+        const account = await prisma.account.findUnique({
             where: { email }
         })
 
-        if (!user) {
+        if (!account) {
             return res.status(400).json({ message: 'Invalid credentials' })
         }
 
-        const correctPassword = await bcrypt.compare(password, user.password)
+        const correctPassword = await bcrypt.compare(password, account.password)
 
         if (!correctPassword) {
             return res.status(400).json({ messsage: 'Invalid credentials' })
         }
 
         const token = jwt.sign(
-            { userId: user.id },
+            { accountId: account.id },
             process.env.JWT_SECRET as string,
             { expiresIn: '6hr' }
         )
@@ -96,10 +96,10 @@ const signIn = async (req: Request, res: Response) => {
         res.json({
             message: 'Login successful',
             token,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email
+            account: {
+                id: account.id,
+                name: account.name,
+                email: account.email
             }
         })
 
