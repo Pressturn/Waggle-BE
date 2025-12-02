@@ -84,4 +84,40 @@ const getSingleDog = async (req: AuthRequest, res: Response) => {
     }
 }
 
-export { createDog, getAllDogs, getSingleDog }
+const updateDog = async (req: AuthRequest, res: Response) => {
+    try {
+        const { id } = req.params
+        const { name, breed, age, weight, photo, allergies, dietaryRestrictions, medication, vetContact }
+            = req.body
+
+        const existingDog = await prisma.dog.findUnique({
+            where: { id }
+        })
+
+        if (!existingDog) {
+            return res.status(404).json({ message: 'Dog not found' })
+        }
+
+        const dog = await prisma.dog.update({
+            where: { id },
+            data: {
+                name,
+                breed,
+                age,
+                weight,
+                photo,
+                allergies,
+                dietaryRestrictions,
+                medication,
+                vetContact
+            }
+        })
+
+        res.json({ message: 'Dog Updated Successfully', dog })
+
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' })
+    }
+}
+
+export { createDog, getAllDogs, getSingleDog, updateDog }
