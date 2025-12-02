@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes'
 import dogRoutes from './routes/dogRoutes'
+import activityRoutes from './routes/activityRoutes'
 
 dotenv.config()
 
@@ -14,6 +15,7 @@ app.use(express.json())
 
 app.use('/api/auth', authRoutes)
 app.use('/api/dogs', dogRoutes)
+app.use('/api/activities', activityRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'Api is running' })

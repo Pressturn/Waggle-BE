@@ -7,16 +7,59 @@ interface AuthRequest extends Request {
     }
 }
 
-const createActivity = async (req: AuthRequest, res: Response){
+const createActivity = async (req: AuthRequest, res: Response) => {
     try {
+        const { type, date, time, foodType, portion, activityKind, medication, notes, photo, dogId }
+            = req.body
 
-        const{ type, notes, photo, photoId}
+        const accountId = req.account?.accountId
+        const profile = await prisma.profile.findFirst({
+            where: { accountId }
+        })
+
+        if (!profile) {
+            return res.status(400).json({ message: 'Profile not found' })
+        }
+
+        const dog = await prisma.dog.findUnique({
+            where: { id: dogId }
+        })
+
+        if (!dog) {
+            return res.status(404).json({ message: 'Dog not found' })
+        }
+
+        if (dog.householdId !== profile.householdId) {
+            return res.status(403).json({ message: 'Dog not in your household' })
+        }
+
+        const activity = await prisma.activity.create({
+            data: {
+                type,
+                date: new Date(date),
+                time,
+                foodType,
+                portion,
+                activityKind,
+                medication,
+                notes,
+                photo,
+                dogId,
+                loggedById: profile.id
+            },
+            include: {
+                dog: true,
+                loggedBy: true
+            }
+        })
+
+        res.status(201).json({ message: 'Activity Logged', activity })
     } catch (error) {
         res.status(500).json({ message: 'Server Error' })
     }
 }
 
-const getAllActivities = async (req: AuthRequest, res: Response){
+const getAllActivities = async (req: AuthRequest, res: Response) => {
     try {
 
     } catch (error) {
@@ -24,7 +67,7 @@ const getAllActivities = async (req: AuthRequest, res: Response){
     }
 }
 
-const getTodayActivities = async (req: AuthRequest, res: Response){
+const getTodayActivities = async (req: AuthRequest, res: Response) => {
     try {
 
     } catch (error) {
@@ -32,7 +75,7 @@ const getTodayActivities = async (req: AuthRequest, res: Response){
     }
 }
 
-const updateActivity = async (req: AuthRequest, res: Response){
+const updateActivity = async (req: AuthRequest, res: Response) => {
     try {
 
     } catch (error) {
@@ -40,7 +83,7 @@ const updateActivity = async (req: AuthRequest, res: Response){
     }
 }
 
-const deleteActivity = async (req: AuthRequest, res: Response){
+const deleteActivity = async (req: AuthRequest, res: Response) => {
     try {
 
     } catch (error) {
