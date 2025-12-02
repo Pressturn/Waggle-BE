@@ -120,4 +120,27 @@ const updateDog = async (req: AuthRequest, res: Response) => {
     }
 }
 
-export { createDog, getAllDogs, getSingleDog, updateDog }
+const deleteDog = async (req: AuthRequest, res: Response) => {
+    try {
+        const { id } = req.params
+
+        const existingDog = await prisma.dog.findUnique({
+            where: { id }
+        })
+
+        if (!existingDog) {
+            return res.status(404).json({ message: 'Dog not found' })
+        }
+
+        await prisma.dog.delete({
+            where: { id }
+        })
+
+        res.json({ message: 'Dog deleted successfully' })
+    } catch (error) {
+        console.error(error) 
+        res.status(500).json({ message: 'Server Error' })
+    }
+}
+
+export { createDog, getAllDogs, getSingleDog, updateDog, deleteDog }
