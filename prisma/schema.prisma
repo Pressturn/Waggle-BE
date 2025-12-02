@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -83,15 +83,32 @@ model Dog {
 }
 
 model Activity {
-  id         String       @id @default(uuid())
-  type       ActivityType
-  notes      String?
-  photo      String?
-  timestamp  DateTime     @default(now())
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  dogId      String
+  id   String       @id @default(uuid())
+  type ActivityType
+  date DateTime
+  time String?
+
+  //Log Feeding
+  foodType String?
+  portion  String?
+
+  // Log Walk/Play 
+  activityKind String?
+
+  // Medication specific
+  medication String?
+
+  // Common Fields
+  notes String?
+  photo String?
+
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  dogId String
+  dog   Dog    @relation(fields: [dogId], references: [id])
+
   loggedById String
-  dog        Dog          @relation(fields: [dogId], references: [id])
-  loggedBy   Profile      @relation(fields: [loggedById], references: [id])
+  loggedBy   Profile @relation(fields: [loggedById], references: [id])
 }

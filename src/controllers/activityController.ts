@@ -10,6 +10,7 @@ interface AuthRequest extends Request {
 const createActivity = async (req: AuthRequest, res: Response){
     try {
 
+        const{ type, notes, photo, photoId}
     } catch (error) {
         res.status(500).json({ message: 'Server Error' })
     }
