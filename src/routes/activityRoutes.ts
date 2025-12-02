@@ -5,9 +5,9 @@ import verifyToken from '../middleware/verifyToken'
 const router = Router()
 
 router.post('/', verifyToken, createActivity)
-router.post('/', verifyToken, getAllActivities)
-router.post('/', verifyToken, getTodayActivities)
-router.post('/', verifyToken, updateActivity)
-router.post('/', verifyToken, deleteActivity)
+router.get('/', verifyToken, getAllActivities)
+router.get('/', verifyToken, getTodayActivities)
+router.put('/', verifyToken, updateActivity)
+router.delete('/', verifyToken, deleteActivity)
 
 export default router

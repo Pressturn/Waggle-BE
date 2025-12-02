@@ -61,7 +61,37 @@ const createActivity = async (req: AuthRequest, res: Response) => {
 
 const getAllActivities = async (req: AuthRequest, res: Response) => {
     try {
+        const accountId = req.account?.accountId
 
+        const profile = await prisma.profile.findFirst({
+            where: { accountId }
+        })
+
+        if (!profile || !profile.householdId) {
+            return res.status(400).json({ message: 'No household found' })
+        }
+
+        const householdDogs = await prisma.dog.findMany({
+            where: { householdId: profile.householdId },
+            select: { id: true }
+        })
+
+        const dogIds = householdDogs.map(dog => dog.id)
+        
+        const activities = await prisma.activity.findMany({
+            where: {
+                dogId: { in: dogIds }
+            },
+            include: {
+                dog: true,
+                loggedBy: true
+            },
+            orderBy: {
+                date: 'desc'
+            }
+        })
+
+        res.json({ activities })
     } catch (error) {
         res.status(500).json({ message: 'Server Error' })
     }
