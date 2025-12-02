@@ -45,4 +45,26 @@ const createDog = async (req: AuthRequest, res: Response) => {
     }
 }
 
-export { createDog }
+const getAllDogs = async (req: AuthRequest, res: Response) => {
+    try {
+        const accountId = req.account?.accountId
+
+        const profile = await prisma.profile.findFirst({
+            where: { accountId }
+        })
+
+        if (!profile || !profile.householdId) {
+            return res.status(400).json({ message: 'No household found' })
+        }
+
+        const dogs = await prisma.dog.findMany({
+            where: { householdId: profile.householdId }
+        })
+
+        res.json({ dogs })
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' })
+    }
+}
+
+export { createDog, getAllDogs }
