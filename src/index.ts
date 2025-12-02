@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes'
+import dogRoutes from './routes/dogRoutes'
 
 dotenv.config()
 
@@ -12,6 +13,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/api/auth', authRoutes)
+app.use('/api/dogs', dogRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'Api is running' })

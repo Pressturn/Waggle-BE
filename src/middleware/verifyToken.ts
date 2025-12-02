@@ -17,7 +17,7 @@ const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
     const tokenWithoutBearer = token.split(' ')[1]
 
     try {
-        const decoded = jwt.verify(tokenWithoutBearer, process.env.JWT_SECTRET as string) as { accountId: string }
+        const decoded = jwt.verify(tokenWithoutBearer, process.env.JWT_SECRET as string) as { accountId: string }
         req.account = decoded
         next()
     } catch (error) {
