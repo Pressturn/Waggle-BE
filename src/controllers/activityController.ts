@@ -77,7 +77,7 @@ const getAllActivities = async (req: AuthRequest, res: Response) => {
         })
 
         const dogIds = householdDogs.map(dog => dog.id)
-        
+
         const activities = await prisma.activity.findMany({
             where: {
                 dogId: { in: dogIds }
@@ -97,18 +97,44 @@ const getAllActivities = async (req: AuthRequest, res: Response) => {
     }
 }
 
-const getTodayActivities = async (req: AuthRequest, res: Response) => {
-    try {
-
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' })
-    }
-}
-
 const updateActivity = async (req: AuthRequest, res: Response) => {
     try {
 
+        const { id } = req.params
+        const { type, date, time, foodType, portion, activityKind, medication, notes, photo }
+            = req.body
+
+        const existingActivity = await prisma.activity.findUnique({
+            where: { id }
+        })
+
+        if (!existingActivity) {
+            return res.status(404).json({ message: 'Activity not found' })
+        }
+
+        const activity = await prisma.activity.update({
+            where: { id },
+            data: {
+                type,
+                date: date ? new Date(date) : undefined,
+                time,
+                foodType,
+                portion,
+                activityKind,
+                medication,
+                notes,
+                photo
+            },
+            include: {
+                dog: true,
+                loggedBy: true,
+            }
+        })
+
+        res.json({ message: 'Activity updated successfully', activity })
     } catch (error) {
+        console.error('Update activity error:', error)  // ← Add this to see actual error
+
         res.status(500).json({ message: 'Server Error' })
     }
 }
@@ -121,4 +147,4 @@ const deleteActivity = async (req: AuthRequest, res: Response) => {
     }
 }
 
-export { createActivity, getAllActivities, getTodayActivities, updateActivity, deleteActivity }
+export { createActivity, getAllActivities, updateActivity, deleteActivity }
