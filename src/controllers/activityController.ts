@@ -142,7 +142,23 @@ const updateActivity = async (req: AuthRequest, res: Response) => {
 const deleteActivity = async (req: AuthRequest, res: Response) => {
     try {
 
+        const { id } = req.params
+
+        const existingActivity = await prisma.activity.findUnique({
+            where: { id }
+        })
+
+        if (!existingActivity) {
+            return res.status(404).json({ message: 'Activity not found' })
+        }
+
+        await prisma.activity.delete({
+            where: { id }
+        })
+
+        res.json({ message: 'Activity deleted successfully' })
     } catch (error) {
+        console.error(error)
         res.status(500).json({ message: 'Server Error' })
     }
 }

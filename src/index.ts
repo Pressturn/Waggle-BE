@@ -17,7 +17,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/dogs', dogRoutes)
 app.use('/api/activities', activityRoutes)
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req, res ) => {
     res.json({ message: 'Api is running' })
 })
 
