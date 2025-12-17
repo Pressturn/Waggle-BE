@@ -22,6 +22,7 @@ enum Role {
 
 enum ActivityType {
   MEAL
+  PLAY
   WALK
   WATER
   MEDICATION

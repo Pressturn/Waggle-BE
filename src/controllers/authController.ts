@@ -84,7 +84,7 @@ const signIn = async (req: Request, res: Response) => {
         const correctPassword = await bcrypt.compare(password, account.password)
 
         if (!correctPassword) {
-            return res.status(400).json({ messsage: 'Invalid credentials' })
+            return res.status(400).json({ message: 'Invalid credentials' })
         }
 
         const token = jwt.sign(

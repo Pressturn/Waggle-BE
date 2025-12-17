@@ -55,6 +55,7 @@ const createActivity = async (req: AuthRequest, res: Response) => {
 
         res.status(201).json({ message: 'Activity Logged', activity })
     } catch (error) {
+        console.error('Create activity error:', error)
         res.status(500).json({ message: 'Server Error' })
     }
 }
@@ -86,9 +87,10 @@ const getAllActivities = async (req: AuthRequest, res: Response) => {
                 dog: true,
                 loggedBy: true
             },
-            orderBy: {
-                date: 'desc'
-            }
+            orderBy: [
+                { date: 'desc' },
+                { time: 'desc' }
+            ]
         })
 
         res.json({ activities })
