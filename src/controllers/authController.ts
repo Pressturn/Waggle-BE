@@ -7,7 +7,7 @@ const saltRounds = 10
 
 const signUp = async (req: Request, res: Response) => {
     try {
-        const { name, email, password, householdCode } = req.body
+        const { name, email, password, inviteCode } = req.body
 
         const existingAccount = await prisma.account.findUnique({
             where: { email }
@@ -20,22 +20,37 @@ const signUp = async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds)
 
         let householdId: string | undefined
-        let role: 'OWNER' | 'MEMBER' = 'OWNER'
+        let role: 'OWNER' | 'MEMBER' | 'STAFF' = 'OWNER'
 
-        if (householdCode) {
-            const household = await prisma.household.findUnique({
-                where: { code: householdCode }
+        if (inviteCode) {
+                console.log('📩 Invite code received:', inviteCode)
+
+            const invite = await prisma.invite.findUnique({
+                where: { code: inviteCode }
             })
 
+                console.log('📩 Invite code received:', inviteCode)
 
-            if (!household) {
-                return res.status(400).json({ message: 'Invalid household code' })
+
+            if (!invite) {
+                return res.status(400).json({ message: 'Invalid invite code' })
             }
 
-            householdId = household.id
-            role = 'MEMBER'
+            householdId = invite.householdId
+            role = invite.role
+
+console.log('✅ Setting role to:', role)
+    console.log('✅ Setting householdId to:', householdId)
+
+            await prisma.invite.update({
+                where: { id: invite.id },
+                data: { usedAt: new Date() }
+            })
         }
-        
+
+        console.log('🎯 Final role before creating account:', role)
+console.log('🎯 Final householdId before creating account:', householdId)
+
         const account = await prisma.account.create({
             data: {
                 name,
@@ -45,12 +60,11 @@ const signUp = async (req: Request, res: Response) => {
                     create: {
                         type: 'FAMILY',
                         name: name,
-                        role: 'OWNER',
-                        household: {
-                            create: {
-                                name: `${name}'s Family`
-                            }
-                        }
+                        role: role,
+                        ...(householdId
+                            ? { household: { connect: { id: householdId } } }
+                            : { household: { create: { name: `${name}'s Family` } } }
+                        )
                     }
                 }
             },
@@ -91,7 +105,14 @@ const signIn = async (req: Request, res: Response) => {
         const { email, password } = req.body
 
         const account = await prisma.account.findUnique({
-            where: { email }
+            where: { email },
+            include: {
+                Profile: {
+                    include: {
+                        household: true
+                    }
+                }
+            }
         })
 
         if (!account) {
@@ -116,7 +137,8 @@ const signIn = async (req: Request, res: Response) => {
             account: {
                 id: account.id,
                 name: account.name,
-                email: account.email
+                email: account.email,
+                profile: account.Profile[0]
             }
         })
 
