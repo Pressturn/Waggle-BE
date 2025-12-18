@@ -14,12 +14,7 @@ function generateInviteCode(): string {
 const createInvite = async (req: AuthRequest, res: Response) => {
     try {
         const accountId = req.account?.accountId
-        const { role } = req.body
-
-        if (!['MEMBER', 'STAFF'].includes(role)) {
-            return res.status(400).json({ message: 'Invalid role' })
-        }
-
+       
         const profile = await prisma.profile.findFirst({
             where: { accountId }
         })
@@ -43,7 +38,7 @@ const createInvite = async (req: AuthRequest, res: Response) => {
             data: {
                 code,
                 householdId: profile.householdId,
-                role: role,
+                role: 'MEMBER',
                 createdById: profile.id,
                 expiresAt
             }
