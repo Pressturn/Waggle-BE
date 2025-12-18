@@ -39,18 +39,12 @@ const signUp = async (req: Request, res: Response) => {
             householdId = invite.householdId
             role = invite.role
 
-console.log('✅ Setting role to:', role)
-    console.log('✅ Setting householdId to:', householdId)
-
             await prisma.invite.update({
                 where: { id: invite.id },
                 data: { usedAt: new Date() }
             })
         }
-
-        console.log('🎯 Final role before creating account:', role)
-console.log('🎯 Final householdId before creating account:', householdId)
-
+    
         const account = await prisma.account.create({
             data: {
                 name,
