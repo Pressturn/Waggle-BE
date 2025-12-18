@@ -19,8 +19,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/dogs', dogRoutes)
 app.use('/api/activities', activityRoutes)
 app.use('/api/invite', inviteRoutes)
-app.use('/households', householdRoutes)
-
+app.use('/api/households', householdRoutes)
 
 app.get('/', (req, res) => {
     res.json({ message: 'Api is running' })
