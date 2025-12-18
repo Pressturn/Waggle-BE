@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes'
 import dogRoutes from './routes/dogRoutes'
 import activityRoutes from './routes/activityRoutes'
 import inviteRoutes from './routes/inviteRoutes'
+import householdRoutes from './routes/householdRoutes'
 
 dotenv.config()
 
@@ -18,8 +19,10 @@ app.use('/api/auth', authRoutes)
 app.use('/api/dogs', dogRoutes)
 app.use('/api/activities', activityRoutes)
 app.use('/api/invite', inviteRoutes)
+app.use('/households', householdRoutes)
 
-app.get('/', (req, res ) => {
+
+app.get('/', (req, res) => {
     res.json({ message: 'Api is running' })
 })
 
