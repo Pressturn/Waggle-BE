@@ -7,7 +7,7 @@ const saltRounds = 10
 
 const signUp = async (req: Request, res: Response) => {
     try {
-        const { name, email, password } = req.body
+        const { name, email, password, householdCode } = req.body
 
         const existingAccount = await prisma.account.findUnique({
             where: { email }
@@ -19,6 +19,23 @@ const signUp = async (req: Request, res: Response) => {
 
         const hashedPassword = await bcrypt.hash(password, saltRounds)
 
+        let householdId: string | undefined
+        let role: 'OWNER' | 'MEMBER' = 'OWNER'
+
+        if (householdCode) {
+            const household = await prisma.household.findUnique({
+                where: { code: householdCode }
+            })
+
+
+            if (!household) {
+                return res.status(400).json({ message: 'Invalid household code' })
+            }
+
+            householdId = household.id
+            role = 'Member'
+        }
+        
         const account = await prisma.account.create({
             data: {
                 name,

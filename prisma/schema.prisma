@@ -30,6 +30,7 @@ model Profile {
   activities  Activity[]
   account     Account     @relation(fields: [accountId], references: [id])
   household   Household?  @relation(fields: [householdId], references: [id])
+  invites     Invite[]
 }
 
 model Household {
@@ -37,9 +38,10 @@ model Household {
   name      String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  code      String?  @unique @default(cuid())
+  code      String?   @unique @default(cuid())
   dogs      Dog[]
   profile   Profile[]
+  invites   Invite[]
 }
 
 model Dog {
@@ -78,6 +80,22 @@ model Activity {
   activityKind String?
   dog          Dog          @relation(fields: [dogId], references: [id])
   loggedBy     Profile      @relation(fields: [loggedById], references: [id])
+}
+
+model Invite {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  role        Role      @default(MEMBER)
+  createdById String
+  createdBy   Profile   @relation(fields: [createdById], references: [id])
+  expiresAt   DateTime?
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([code])
+  @@index([householdId])
 }
 
 enum ProfileType {
