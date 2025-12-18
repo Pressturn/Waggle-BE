@@ -18,7 +18,7 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/dogs', dogRoutes)
 app.use('/api/activities', activityRoutes)
-app.use('/api/invite', inviteRoutes)
+app.use('/api/invites', inviteRoutes)
 app.use('/api/households', householdRoutes)
 
 app.get('/', (req, res) => {
