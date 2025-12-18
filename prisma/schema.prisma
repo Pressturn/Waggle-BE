@@ -8,28 +8,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-//enum 
-
-enum ProfileType {
-  FAMILY
-}
-
-enum Role {
-  OWNER
-  MEMBER
-  STAFF
-}
-
-enum ActivityType {
-  MEAL
-  PLAY
-  WALK
-  WATER
-  MEDICATION
-}
-
-//models
-
 model Account {
   id        String    @id @default(uuid())
   name      String
@@ -41,19 +19,17 @@ model Account {
 }
 
 model Profile {
-  id        String      @id @default(uuid())
-  type      ProfileType
-  name      String
-  role      Role
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  accountId String
-  account   Account @relation(fields: [accountId], references: [id])
-
+  id          String      @id @default(uuid())
+  type        ProfileType
+  name        String
+  role        Role
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  accountId   String
   householdId String?
   activities  Activity[]
-  household   Household? @relation(fields: [householdId], references: [id])
+  account     Account     @relation(fields: [accountId], references: [id])
+  household   Household?  @relation(fields: [householdId], references: [id])
 }
 
 model Household {
@@ -61,6 +37,7 @@ model Household {
   name      String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  code      String?  @unique @default(cuid())
   dogs      Dog[]
   profile   Profile[]
 }
@@ -84,32 +61,39 @@ model Dog {
 }
 
 model Activity {
-  id   String       @id @default(uuid())
-  type ActivityType
-  date DateTime
-  time String?
-
-  //Log Feeding
-  foodType String?
-  portion  String?
-
-  // Log Walk/Play 
+  id           String       @id @default(uuid())
+  type         ActivityType
+  notes        String?
+  photo        String?
+  timestamp    DateTime     @default(now())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  dogId        String
+  loggedById   String
+  date         DateTime
+  foodType     String?
+  medication   String?
+  portion      String?
+  time         String?
   activityKind String?
+  dog          Dog          @relation(fields: [dogId], references: [id])
+  loggedBy     Profile      @relation(fields: [loggedById], references: [id])
+}
 
-  // Medication specific
-  medication String?
+enum ProfileType {
+  FAMILY
+}
 
-  // Common Fields
-  notes String?
-  photo String?
+enum Role {
+  OWNER
+  MEMBER
+  STAFF
+}
 
-  timestamp DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  dogId String
-  dog   Dog    @relation(fields: [dogId], references: [id])
-
-  loggedById String
-  loggedBy   Profile @relation(fields: [loggedById], references: [id])
+enum ActivityType {
+  MEAL
+  WALK
+  WATER
+  MEDICATION
+  PLAY
 }
