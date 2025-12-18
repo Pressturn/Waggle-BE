@@ -33,7 +33,7 @@ const signUp = async (req: Request, res: Response) => {
             }
 
             householdId = household.id
-            role = 'Member'
+            role = 'MEMBER'
         }
         
         const account = await prisma.account.create({

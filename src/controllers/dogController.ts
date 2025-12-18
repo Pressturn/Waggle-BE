@@ -122,7 +122,17 @@ const updateDog = async (req: AuthRequest, res: Response) => {
 
 const deleteDog = async (req: AuthRequest, res: Response) => {
     try {
+        const accountId = req.account?.accountId
         const { id } = req.params
+
+        const profile = await prisma.profile.findFirst({
+            where: { accountId },
+            select: { role: true, householdId: true }
+        })
+
+        if (profile?.role !== 'OWNER') {
+            return res.status(403).json({ message: 'Only household owners can delete pets' })
+        }
 
         const existingDog = await prisma.dog.findUnique({
             where: { id }
@@ -138,7 +148,7 @@ const deleteDog = async (req: AuthRequest, res: Response) => {
 
         res.json({ message: 'Dog deleted successfully' })
     } catch (error) {
-        console.error(error) 
+        console.error(error)
         res.status(500).json({ message: 'Server Error' })
     }
 }
