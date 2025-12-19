@@ -23,14 +23,10 @@ const signUp = async (req: Request, res: Response) => {
         let role: 'OWNER' | 'MEMBER' | 'STAFF' = 'OWNER'
 
         if (inviteCode) {
-                console.log('📩 Invite code received:', inviteCode)
 
             const invite = await prisma.invite.findUnique({
                 where: { code: inviteCode }
             })
-
-                console.log('📩 Invite code received:', inviteCode)
-
 
             if (!invite) {
                 return res.status(400).json({ message: 'Invalid invite code' })
